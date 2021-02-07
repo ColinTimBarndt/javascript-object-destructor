@@ -1,0 +1,16 @@
+{
+	"name": "object-destructor",
+	"version": "0.1.0",
+	"description": "Enables attaching a destructor to an object which is called after its garbage collection by the browser.",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [
+		"gc",
+		"wasm",
+		"WebAssembly"
+	],
+	"author": "Colin Tim Barndt",
+	"license": "GPL-3.0-or-later"
+}
