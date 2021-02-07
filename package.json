@@ -12,5 +12,6 @@
 		"WebAssembly"
 	],
 	"author": "Colin Tim Barndt",
-	"license": "GPL-3.0-or-later"
+	"license": "GPL-3.0-or-later",
+	"repository": "github:ColinTimBarndt/javascript-object-destructor"
 }
