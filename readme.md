@@ -1,7 +1,7 @@
 # Object Destructor
 
-This module was build for the browser. Node JS does not support
-[`WeakRef`][weakref], which this module relies on.
+This ES6 module was build for the browser. You will need a
+transpiler like TypeScript to use this with Node JS.
 
 ## Usage
 
@@ -38,7 +38,7 @@ instead of the object itself. This reduces the risk of accidentally
 storing an object reference in the destructor's scope:
 
 ```js
-// THIS CODE DOES NOT WORK
+// THIS CODE MIGHT NOT WORK
 {
 	let test = [1, 2, 3, 4];
 	window.objs = {
@@ -68,5 +68,13 @@ counting" and you don't want to free memory in WASM if the object
 could still be used by JavaScript. In this case, you need to know
 when all references to the structure have also been dropped on the
 JavaScript side. That's what this module was made for.
+
+## Browser Compatibility
+
+See <https://caniuse.com/mdn-javascript_builtins_weakref>:
+
+| IE  | Edge | Firefox | Chrome | Safari | Opera | iOS Safari | Opera Mini | Android Browser | Opera Mobile | Chrome for Android | Firefox for Android |
+| --- | ---- | ------- | ------ | ------ | ----- | ---------- | ---------- | --------------- | ------------ | ------------------ | ------------------- |
+| ❌  | ✅   | ✅      | ✅     | ❌     | ❌    | ❌         | ❌         | ❌              | ❌           | ✅                 | ✅                  |
 
 [weakref]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakRef
