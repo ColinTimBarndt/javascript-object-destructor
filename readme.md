@@ -1,6 +1,6 @@
 # Object Destructor
 
-This ES6 module was build for the browser. You will need a
+This ES6 module was built for the browser. You will need a
 transpiler like TypeScript to use this with Node JS.
 
 ## Usage
@@ -8,7 +8,7 @@ transpiler like TypeScript to use this with Node JS.
 The module only exports one function, `addDestructor`. It takes
 a function which creates an object and a function that should be
 called some time after the object's creation. When exactly it is
-called cannot be relied one, because it depends on the browser's
+called cannot be relied on, because it depends on the browser's
 implementation of the garbage collection.
 
 ```js
@@ -31,7 +31,7 @@ in your code**!
 
 Also note that you cannot use a reference to the object in the
 destructor, because then the destructor is keeping the object
-alive ans is never going to be called. A reference also cannot
+alive and is never going to be called. A reference also cannot
 exist in the same scope that the destructor is inside of. That's
 why `addDestructor` takes a function that creates the object
 instead of the object itself. This reduces the risk of accidentally
@@ -54,15 +54,15 @@ delete objs.test;
 
 ## Why?
 
-You should never have to use this module in your everyday code.
-It might be interesting for use with WebAssembly and smart pointers.
-For example: You want to expose a WASM function that returns a smart
-pointer to a structure. The structure itself is stored in the WASM
-heap memory. Now, if you don't want the structure to permanently
-occupy the memory and be destroyed if it is not used anymore, it is
+You should never have to use this module in your everyday code. That
+said, it might be interesting for use with WebAssembly and smart
+pointers. For example: You want to expose a WASM function that returns
+a smart pointer to a structure. The structure itself is stored in the
+WASM heap memory. Now, if you don't want the structure to permanently
+occupy the memory, and be destroyed if it is not used anymore, it is
 very easy on the native (WASM) side, because smart pointers are
 already implemented there. They work by counting the references to
-the wrapped structure and free the memory if the last pointer is
+the wrapped structure, and free the memory if the last pointer is
 dropped. On the JavaScript side, however, there is no "reference
 counting" and you don't want to free memory in WASM if the object
 could still be used by JavaScript. In this case, you need to know
@@ -75,6 +75,6 @@ See <https://caniuse.com/mdn-javascript_builtins_weakref>:
 
 | IE  | Edge | Firefox | Chrome | Safari | Opera | iOS Safari | Opera Mini | Android Browser | Opera Mobile | Chrome for Android | Firefox for Android |
 | --- | ---- | ------- | ------ | ------ | ----- | ---------- | ---------- | --------------- | ------------ | ------------------ | ------------------- |
-| ❌  | ✅   | ✅      | ✅     | ❌     | ❌    | ❌         | ❌         | ❌              | ❌           | ✅                 | ✅                  |
+| ❌  | ✅   | ✅      | ✅     | ✅     | ✅    | ✅         | ❌         | ✅              | ✅           | ✅                 | ✅                  |
 
 [weakref]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakRef
