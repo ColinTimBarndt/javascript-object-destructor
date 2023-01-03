@@ -1,8 +1,5 @@
 # Object Destructor
 
-This ES6 module was built for the browser. You will need a
-transpiler like TypeScript to use this with Node JS.
-
 ## Usage
 
 The module only exports one function, `addDestructor`. It takes
