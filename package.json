@@ -1,7 +1,7 @@
 {
 	"name": "object-destructor",
-	"version": "0.1.0",
-	"description": "Enables attaching a destructor to an object which is called after its garbage collection by the browser.",
+	"version": "0.1.1",
+	"description": "Enables attaching a destructor to an object which is called after its garbage collection.",
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"

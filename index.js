@@ -16,19 +16,7 @@
  */
 const destructors = new Map();
 
-setInterval(() => {
-	destructors.forEach((des, ref) => {
-		if (ref.deref()) return;
-		// Garbage collected
-		destructors.delete(ref);
-		console.log("Collected");
-		try {
-			des();
-		} catch (e) {
-			console.error(e);
-		}
-	});
-}, 5000);
+let destructionInterval = undefined;
 
 /**
  * @param {() => T} objCreator A function that creates an object.
@@ -36,7 +24,7 @@ setInterval(() => {
  * @returns {T}
  * @template T
  */
-export default function addDestructor(objCreator, objDestructor) {
+function addDestructor(objCreator, objDestructor) {
 	const sym = Symbol("destructor");
 	{
 		const obj = objCreator();
@@ -45,6 +33,29 @@ export default function addDestructor(objCreator, objDestructor) {
 		const desObj = Object.freeze({ destructor: sym });
 		destructors.set(new WeakRef(desObj), objDestructor);
 		Object.defineProperty(obj, sym, { value: desObj, writable: false });
+
+		if (destructionInterval === undefined) {
+			destructionInterval = setInterval(() => {
+				destructors.forEach((des, ref) => {
+					if (ref.deref()) return;
+					// Garbage collected
+					destructors.delete(ref);
+					des();
+				});
+
+				if (destructors.size < 1) {
+					clearInterval(destructionInterval);
+					destructionInterval = undefined;
+				}
+			}, 500);
+		}
+
 		return obj;
 	}
+}
+
+if (typeof process === 'object' && typeof require === 'function') {
+	module.exports = {
+		addDestructor,
+	};
 }
