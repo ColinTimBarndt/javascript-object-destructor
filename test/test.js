@@ -1,4 +1,4 @@
-import addDestructor from "./index.js";
+import {addDestructor} from "../dist/index.esm.js";
 
 window.objs = {
 	test: addDestructor(
@@ -6,3 +6,4 @@ window.objs = {
 		() => console.log("test has been destroyed.")
 	),
 };
+delete window.objs;

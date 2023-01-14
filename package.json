@@ -1,17 +1,52 @@
 {
 	"name": "object-destructor",
-	"version": "0.1.1",
+	"version": "1.0.0",
 	"description": "Enables attaching a destructor to an object which is called after its garbage collection.",
-	"main": "index.js",
+	"exports": {
+		".": {
+			"require": "./dist/index.js",
+			"import": "./dist/index.esm.js"
+		}
+	},
+	"types": "dist/index.d.ts",
+	"files": [
+		"dist",
+		"README.md"
+	],
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"prepack": "rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript"
 	},
 	"keywords": [
 		"gc",
 		"wasm",
-		"WebAssembly"
+		"WebAssembly",
+		"finalizer"
 	],
 	"author": "Colin Tim Barndt",
-	"license": "GPL-3.0-or-later",
-	"repository": "github:ColinTimBarndt/javascript-object-destructor"
+	"license": "Apache-2.0",
+	"repository": "github:ColinTimBarndt/javascript-object-destructor",
+	"devDependencies": {
+		"@rollup/plugin-terser": "^0.3.0",
+		"@rollup/plugin-typescript": "^11.0.0",
+		"rollup": "^3.10.0",
+		"tslib": "^2.4.1",
+		"typescript": "^4.9.4"
+	},
+	"engines": {
+		"node": ">= v14.6.0"
+	},
+	"browserslist": [
+		"Node >= 14.6.0",
+		"Edge >= 84",
+		"Firefox >= 79",
+		"Chrome >= 84",
+		"Safari >= 14.1",
+		"Opera >= 70",
+		"iOS >= 14.5",
+		"Android >= 108",
+		"op_mob >= 72",
+		"ChromeAndroid >= 108",
+		"FirefoxAndroid >= 107"
+	]
 }
