@@ -112,7 +112,7 @@ JavaScript side. That's what this module was made for.
 ## Browser Compatibility
 
 This module's functionality depends on whether the target platform
-supports `WealRef`. All major browsers support it, including Node.
+supports [WeakRef]. All major browsers support it, including Node.
 
 See <https://caniuse.com/mdn-javascript_builtins_weakref>:
 
@@ -120,4 +120,4 @@ See <https://caniuse.com/mdn-javascript_builtins_weakref>:
 |-------|-----|------|---------|--------|--------|-------|------------|------------|-----------------|--------------|--------------------|---------------------|
 | 14.6+ | X   | 84+  | 79+     | 84+    | 14.1+  | 70+   | 14.5+      | X          | 108+            | 72+          | 108+               | 107+                |
 
-[weakref]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakRef
+[WeakRef]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakRef
