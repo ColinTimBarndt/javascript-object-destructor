@@ -4,7 +4,7 @@
 
 The module exports the function `addDestructor`. It takes
 a function which creates an object and a function that should be
-called some time after the object's creation. When exactly it is
+called some time after the object's destruction. When exactly it is
 called cannot be relied on, because it depends on the browser's
 implementation of the garbage collection.
 
