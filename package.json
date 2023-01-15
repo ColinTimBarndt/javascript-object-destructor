@@ -1,6 +1,6 @@
 {
 	"name": "object-destructor",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "Enables attaching a destructor to an object which is called after its garbage collection.",
 	"exports": {
 		".": {
@@ -11,6 +11,7 @@
 	"types": "dist/index.d.ts",
 	"files": [
 		"dist",
+		"src",
 		"README.md"
 	],
 	"scripts": {

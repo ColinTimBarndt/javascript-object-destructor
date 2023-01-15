@@ -1,2 +1,0 @@
-"use strict";const e=new Map;let t,r=500;function o(){e.forEach(((t,r)=>{if(!r.deref()){e.delete(r);try{t()}catch(e){console.error("Exception during destructor call:",e)}}})),e.size<1&&(clearInterval(t),t=void 0)}exports.addDestructor=function(n,c){const a=n();if("object"!=typeof a)throw new TypeError("Creator did not return an object.");return e.set(new WeakRef(a),c),void 0===t&&(t=setInterval(o,r)),a},exports.setDetectionInterval=function(e){r!==e&&(r=e,void 0!==t&&(clearInterval(t),setInterval(o,r)))};
-//# sourceMappingURL=index.js.map

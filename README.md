@@ -2,70 +2,95 @@
 
 ## Usage
 
-The module exports the function `addDestructor`. It takes
-a function which creates an object and a function that should be
-called some time after the object's destruction. When exactly it is
-called cannot be relied on, because it depends on the browser's
-implementation of the garbage collection.
+The module exports the function `onDestroy`. It takes an object
+to watch and a function that should be called some time after the
+object's destruction. When exactly it is called cannot be relied on,
+because it depends on the browser's implementation of the garbage
+collection.
 
 ```js
-window.objs = {
-    test: addDestructor(
-        () => [1, 2, 3, 4],
-        () => console.log("test has been destroyed.")
-    ),
-};
-objs.test.push(5);
-delete objs.test;
-// `test` is going to be garbage collected.
+doStuff();
+function doStuff() {
+    let myArray = [1, 2, 3, 4];
+    onDestroy(myArray, () => console.log("Destroyed"));
+    // myArray is out of scope and will be garbage-collected
+}
+```
+
+There is also an asynchronous version available:
+
+```js
+doStuff();
+async function doStuff() {
+    let myArray = [1, 2, 3, 4];
+    let lock = untilDestroyed(myArray);
+    myArray = null;
+    await lock;
+    console.log("Destroyed");
+}
 ```
 
 At the moment, it is checked every 500ms whether an object has been
-garbage-collected. you can configure this interval using the exported
+garbage-collected. You can configure this interval using the exported
 function `setDetectionInterval` which takes the millisecond interval
 as its only argument.
+
+Before using this module, please read through the danger zone to
+understand the quirks of a garbage collector in different browsers!
 
 ## Danger Zone
 
 In the previous example, the garbage collection might be called.
-When using Firefox, this is going to happen on the next
-"Cycle Collection" in this specific case. Cycle collections are
-very rare, and **you should never depend on a garbage collection
-in your code**!
+This can happen at any time, and **you should never depend on a
+garbage collection in your code**! Depending on the implementation,
+the browser could also decide not to run a garbage-collection until
+too much memory is used to save on performance.
 
 Also note that you cannot use a reference to the object in the
 destructor, because then the destructor is keeping the object
-alive and is never going to be called. A reference also cannot
-exist in the same scope that the destructor is inside. That's
-why `addDestructor` takes a function that creates the object
-instead of the object itself. This reduces the risk of accidentally
-storing an object reference in the destructor's scope:
+alive and is never going to be called:
 
 ```js
-// THIS CODE MIGHT NOT WORK
-{
-    let test = [1, 2, 3, 4];
-    window.objs = {
-        test: addDestructor(
-            () => test,
-            () => console.log("test has been destroyed")
-        ),
-    };
+// !! MIGHT NOT WORK !!
+doStuff();
+function doStuff() {
+    let myArray = [1, 2, 3, 4];
+    onDestroy(myArray, () => console.log("Destroyed", myArray));
+    // myArray is kept alive by the destructor
 }
-delete objs.test;
-// `test` is probably never going to be garbage collected.
 ```
 
-Why might the above code not work? That's because JavaScript has the
-legacy function `eval` and you can get any variable in scope by calling
-`eval("test")`. This is dynamic. Depending on how optimized the
-JavaScript runtime is, it might bind `test` to the destructor closure
-just to be safe.
+Another example:
+
+```js
+// !! MIGHT NOT WORK !!
+let foo = [1, 2, 3, 4];
+bar();
+foo = [];
+
+function bar() {
+	onDestroy([1, 2, 3, 4], () => console.log("Array has been destroyed (1)."));
+	onDestroy(foo, () => console.log("Array has been destroyed (2)."));
+}
+```
+
+Here, only the first destructor will ever be called in Firefox 108. It has
+probably something to do with the function scope keeping the original
+array alive for some reason. Chromium browsers will destroy both arrays.
+This behavior is best avoided by not adding watched objects to a global
+scope. **Creating an object in a function, attaching the destructor, and
+then returning it is the safest way that I could find**.
+
+Never use `eval` because it *could* access any variable in scope dynamically
+which means that the browser needs to keep everything in scope alive.
 
 Another thing to keep in mind is that your browser's developer tools
 might prevent objects from being garbage-collected if you, for example,
 log the object to the console or even have it give you the object as
 a suggestion.
+
+I tested this module with Firefox 108 and Chromium 109. If you find
+any problems then please don't hesitate to file an issue.
 
 ## Why?
 

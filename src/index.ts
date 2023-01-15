@@ -1,30 +1,48 @@
-const destructors = new Map<WeakRef<object>, () => void>();
+interface Destructor {
+	(): void;
+}
+
+// Two maps are needed: `destructor` for detecting a garbage collection,
+// and `watching` for appending new destructors to an already-watched object
+// to avoid checking the same object for destruction multiple times.
+
+const destructors = new Map<WeakRef<object>, Destructor[]>();
+const watching = new WeakMap<object, Destructor[]>();
 
 let detectionIntervalHandle: number | undefined = undefined;
 let detectionInterval = 500;
 
 /**
- * @param objCreator A function that creates an object.
- * @param objDestructor A function that is called if the object is garbage collected.
+ * @param obj The object to watch for destruction.
+ * @param destructor A function that is called if the object is garbage-collected.
  */
-export function addDestructor<T extends object>(objCreator: () => T, objDestructor: () => void): T {
-	const obj: T = objCreator();
+export function onDestroy<T extends object>(obj: T, destructor: Destructor): T {
 	if (typeof obj !== "object") {
 		throw new TypeError("Creator did not return an object.");
 	}
 
-	//const sym: unique symbol = Symbol("destructor");
-
-	// Dummy object used for detecting destruction
-	//const desObj = Object.freeze({});
-	destructors.set(new WeakRef(obj), objDestructor);
-	//Object.defineProperty(obj, sym, { value: desObj, writable: false });
+	const ref = new WeakRef(obj);
+	if (watching.has(obj)) {
+		watching.get(obj)!.push(destructor);
+	} else {
+		const destructorList = [destructor];
+		destructors.set(ref, destructorList);
+		//watching.set(obj, destructorList);
+	}
 
 	if (detectionIntervalHandle === undefined) {
 		detectionIntervalHandle = setInterval(detectGC, detectionInterval);
 	}
 
 	return obj;
+}
+
+/**
+ * Creates a promise that will resolve once the passed object has been garbage-collected.
+ * @param obj The object to watch for destruction.
+ */
+export function untilDestroyed(obj: object): Promise<void> {
+	return new Promise(resolve => onDestroy(obj, resolve));
 }
 
 /**
@@ -42,15 +60,21 @@ export function setDetectionInterval(interval: number) {
 
 }
 
+/**
+ * Iterates over all weak references. If it cannot be dereferenced,
+ * then it has been garbage-collected and the destructors are called.
+ */
 function detectGC() {
-	destructors.forEach((destructor, ref) => {
+	destructors.forEach((destructorList, ref) => {
 		if (ref.deref()) return;
 		// Garbage collected
 		destructors.delete(ref);
-		try {
-			destructor();
-		} catch (e) {
-			console.error("Exception during destructor call:", e);
+		for (const destructor of destructorList) {
+			try {
+				destructor();
+			} catch (e) {
+				console.error("Exception during destructor call:", e);
+			}
 		}
 	});
 
