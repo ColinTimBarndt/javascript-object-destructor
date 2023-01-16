@@ -1,6 +1,6 @@
 {
 	"name": "object-destructor",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"description": "Enables attaching a destructor to an object which is called after its garbage collection.",
 	"exports": {
 		".": {
@@ -12,11 +12,13 @@
 	"files": [
 		"dist",
 		"src",
+		"!dist/*.tsbuildinfo",
 		"README.md"
 	],
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"prepack": "rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript"
+		"test": "npm run build && playwright test --config playwright.config.ts",
+		"build": "rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
+		"prepack": "npm run build"
 	},
 	"keywords": [
 		"gc",
@@ -28,8 +30,10 @@
 	"license": "Apache-2.0",
 	"repository": "github:ColinTimBarndt/javascript-object-destructor",
 	"devDependencies": {
+		"@playwright/test": "^1.29.2",
 		"@rollup/plugin-terser": "^0.3.0",
 		"@rollup/plugin-typescript": "^11.0.0",
+		"mocha": "^10.2.0",
 		"rollup": "^3.10.0",
 		"tslib": "^2.4.1",
 		"typescript": "^4.9.4"

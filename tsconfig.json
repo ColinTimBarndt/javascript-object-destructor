@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "incremental": true,
     "moduleResolution": "Node",
     "module": "ES2020",
     "target": "ES2021",
@@ -13,10 +14,10 @@
     "noUnusedParameters": true
   },
   "exclude": [
-    "node_modules",
+    "node_modules"
   ],
   "include": [
     "rollup.config.ts",
-    "src/**/*",
+    "src/**/*"
   ]
 }

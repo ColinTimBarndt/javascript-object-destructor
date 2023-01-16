@@ -2,6 +2,10 @@ interface Destructor {
 	(): void;
 }
 
+interface ErrorHandler {
+	(error: unknown): void;
+}
+
 // Two maps are needed: `destructor` for detecting a garbage collection,
 // and `watching` for appending new destructors to an already-watched object
 // to avoid checking the same object for destruction multiple times.
@@ -9,8 +13,9 @@ interface Destructor {
 const destructors = new Map<WeakRef<object>, Destructor[]>();
 const watching = new WeakMap<object, Destructor[]>();
 
-let detectionIntervalHandle: number | undefined = undefined;
+let detectionIntervalHandle: ReturnType<typeof setInterval> | undefined = undefined;
 let detectionInterval = 500;
+let errorHandler: ErrorHandler = error => console.log("Exception during destructor call:", error);
 
 /**
  * @param obj The object to watch for destruction.
@@ -18,7 +23,7 @@ let detectionInterval = 500;
  */
 export function onDestroy<T extends object>(obj: T, destructor: Destructor): T {
 	if (typeof obj !== "object") {
-		throw new TypeError("Creator did not return an object.");
+		throw new TypeError(`Argument is not an object (${typeof obj}).`);
 	}
 
 	const ref = new WeakRef(obj);
@@ -27,7 +32,7 @@ export function onDestroy<T extends object>(obj: T, destructor: Destructor): T {
 	} else {
 		const destructorList = [destructor];
 		destructors.set(ref, destructorList);
-		//watching.set(obj, destructorList);
+		watching.set(obj, destructorList);
 	}
 
 	if (detectionIntervalHandle === undefined) {
@@ -55,9 +60,12 @@ export function setDetectionInterval(interval: number) {
 	detectionInterval = interval;
 	if (detectionIntervalHandle !== undefined) {
 		clearInterval(detectionIntervalHandle);
-		setInterval(detectGC, detectionInterval);
+		detectionIntervalHandle = setInterval(detectGC, detectionInterval);
 	}
+}
 
+export function setErrorHandler(handler: ErrorHandler) {
+	errorHandler = handler;
 }
 
 /**
@@ -73,7 +81,7 @@ function detectGC() {
 			try {
 				destructor();
 			} catch (e) {
-				console.error("Exception during destructor call:", e);
+				errorHandler(e);
 			}
 		}
 	});
